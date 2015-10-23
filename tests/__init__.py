@@ -27,6 +27,7 @@ import sciunit
 from sciunit import Test,Score,ObservationError
 from sciunit.comparators import compute_zscore, assert_dimensionless# Converters.
 from sciunit.scores import ErrorScore,BooleanScore,ZScore # Scores.
+from sciunit.utils import printd
 
 # Neurounit
 from neuronunit.capabilities import ProducesMembranePotential
@@ -246,7 +247,7 @@ class DepolarizationBlockTest(Test):
 		path = self.directory + model.name + '/'
 
 		if not os.path.exists(path):
-			os.makedirs(path)
+			os.makedirs(path, exist_ok=True)
 
 		file_name = path + 'cclamp_' + str(amp) + '.p'
 
@@ -255,7 +256,7 @@ class DepolarizationBlockTest(Test):
 			trace = {}
 			traces=[]
 
-			print("- running amplitude:", amp)
+			printd("- running amplitude:", amp)
 
 			# load cell
 			model.initialise()
@@ -285,7 +286,7 @@ class DepolarizationBlockTest(Test):
 		path_figs = self.directory_figs + 'depol_block/' + model.name + '/'
 
 		if not os.path.exists(path_figs):
-			os.makedirs(path_figs)
+			os.makedirs(path_figs, exist_ok=True)
 
 		print("The figures are saved in the directory: ", path_figs)
 
@@ -386,12 +387,12 @@ class DepolarizationBlockTest(Test):
 
 		if not math.isnan(Veq):
 			Veq_error=abs(Veq*mV-self.observation['mean_Veq'])/self.observation['Veq_std']
-			print("The error of Veq in units of the experimental SD: ", Veq_error)
+			print("The error of Veq in units of the experimental SD: ", Veq_error.base)
 
 
 		if not math.isnan(Ith):
 			Ith_error=abs(Ith*nA-self.observation['mean_Ith'])/self.observation['Ith_std']
-			print("The error of Ith in units of the experimental SD: ", Ith_error)
+			print("The error of Ith in units of the experimental SD: ", Ith_error.base)
 
 
 		num_AP_min=13
@@ -516,7 +517,7 @@ class ObliqueIntegrationTest(Test):
 		path = self.directory + model.name + '/synapse/'
 
 		if not os.path.exists(path):
-			os.makedirs(path)
+			os.makedirs(path, exist_ok=True)
 
 		if interval>0.1:
 			file_name = path + 'synapse_' + str(num)+ '_' + str(ndend)+ '_' + str(xloc) + '.p'
@@ -525,7 +526,7 @@ class ObliqueIntegrationTest(Test):
 
 		if self.force_run_synapse or (os.path.isfile(file_name) is False):
 
-			print("- number of inputs:", num, "dendrite:", ndend, "xloc", xloc)
+			printd("- number of inputs:", num, "dendrite:", ndend, "xloc", xloc)
 
 			model.initialise()
 			model.set_ampa_nmda([ndend,xloc])
@@ -548,7 +549,7 @@ class ObliqueIntegrationTest(Test):
 		path_bin_search = self.directory + model.name + '/bin_search/'
 
 		if not os.path.exists(path_bin_search):
-			os.makedirs(path_bin_search)
+			os.makedirs(path_bin_search, exist_ok=True)
 
 		interval=0.1
 
@@ -653,7 +654,7 @@ class ObliqueIntegrationTest(Test):
 		path_figs = self.directory_figs + 'oblique/' + model.name + '/'
 
 		if not os.path.exists(path_figs):
-			os.makedirs(path_figs)
+			os.makedirs(path_figs, exist_ok=True)
 
 		print("The figures are saved in the directory: ", path_figs)
 
@@ -1380,7 +1381,7 @@ class ObliqueIntegrationTest(Test):
 		path_figs = self.directory_figs + 'oblique/' + model.name + '/'
 
 		if not os.path.exists(path_figs):
-			os.makedirs(path_figs)
+			os.makedirs(path_figs, exist_ok=True)
 
 		stop=len(dend_loc_num_weight)+1
 		sep=numpy.arange(0,stop,11)
@@ -1761,7 +1762,7 @@ class ObliqueIntegrationTest(Test):
 		path_figs = self.directory_figs + 'oblique/' + model_name + '/'
 
 		if not os.path.exists(path_figs):
-			os.makedirs(path_figs)
+			os.makedirs(path_figs, exist_ok=True)
 
 		plt.figure()
 		x =numpy.arange(1,10)
@@ -1861,7 +1862,7 @@ class SomaticFeaturesTest(Test):
 		path = self.directory + model.name + '/soma/'
 
 		if not os.path.exists(path):
-			os.makedirs(path)
+			os.makedirs(path, exist_ok=True)
 
 
 		if stim_type == "SquarePulse":
@@ -1869,7 +1870,7 @@ class SomaticFeaturesTest(Test):
 
 			if self.force_run or (os.path.isfile(file_name) is False):
 
-				print("running stimulus: " + stimulus_name)
+				printd("running stimulus: " + stimulus_name)
 
 				model.initialise()
 				stim_section_name = model.translate(stim_section_name, distance=0)
@@ -1934,7 +1935,7 @@ class SomaticFeaturesTest(Test):
 		path_figs = self.directory_figs + 'soma/' + model.name + '/'
 
 		if not os.path.exists(path_figs):
-			os.makedirs(path_figs)
+			os.makedirs(path_figs, exist_ok=True)
 
 		print("The figures are saved in the directory: ", path_figs)
 
@@ -2014,7 +2015,7 @@ class SomaticFeaturesTest(Test):
 		path_figs = self.directory_figs + 'soma/' + model_name + '/'
 
 		if not os.path.exists(path_figs):
-			os.makedirs(path_figs)
+			os.makedirs(path_figs, exist_ok=True)
 
 		score_sum, feature_results_dict, features_names  = zscore3(observation,prediction)
 

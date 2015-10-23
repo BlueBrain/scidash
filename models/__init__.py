@@ -1,6 +1,7 @@
 import os
 import numpy
 import sciunit
+from sciunit.utils import printd
 from neuronunit.capabilities import ReceivesCurrent,ProducesMembranePotential
 from quantities import ms,mV,Hz
 from neuron import h
@@ -66,7 +67,7 @@ class KaliFreund(sciunit.Model,
 
     def run_cclamp(self):
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -133,7 +134,7 @@ class KaliFreund(sciunit.Model,
         rec_v_dend = h.Vector()
         rec_v_dend.record(h.dendrite[self.ndend](self.xloc)._ref_v)
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
         # initialze and run
         #h.load_file("stdrun.hoc")
         h.stdinit()
@@ -169,7 +170,7 @@ class KaliFreund(sciunit.Model,
 
         exec("self.sect_loc=h." + str(section_rec)+"("+str(loc_rec)+")")
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -255,7 +256,7 @@ class Migliore(sciunit.Model,
 
     def run_cclamp(self):
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -322,7 +323,7 @@ class Migliore(sciunit.Model,
         rec_v_dend = h.Vector()
         rec_v_dend.record(h.apical_dendrite[self.ndend](self.xloc)._ref_v)
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
         # initialze and run
         #h.load_file("stdrun.hoc")
         h.stdinit()
@@ -358,7 +359,7 @@ class Migliore(sciunit.Model,
 
         exec("self.sect_loc=h." + str(section_rec)+"("+str(loc_rec)+")")
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -447,7 +448,7 @@ class Bianchi(sciunit.Model,
 
     def run_cclamp(self):
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -514,7 +515,7 @@ class Bianchi(sciunit.Model,
         rec_v_dend = h.Vector()
         rec_v_dend.record(h.apical_dendrite[self.ndend](self.xloc)._ref_v)
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
         # initialze and run
         #h.load_file("stdrun.hoc")
         h.stdinit()
@@ -550,7 +551,7 @@ class Bianchi(sciunit.Model,
 
         exec("self.sect_loc=h." + str(section_rec)+"("+str(loc_rec)+")")
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -641,7 +642,7 @@ class Golding(sciunit.Model,
 
     def run_cclamp(self):
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
@@ -712,7 +713,7 @@ class Golding(sciunit.Model,
         rec_v_dend = h.Vector()
         rec_v_dend.record(self.dendrite(self.xloc)._ref_v)
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
         # initialze and run
         #h.load_file("stdrun.hoc")
         h.stdinit()
@@ -748,7 +749,7 @@ class Golding(sciunit.Model,
 
         exec("self.sect_loc=h." + str(section_rec)+"("+str(loc_rec)+")")
 
-        print(("- running model", self.name))
+        printd(("- running model", self.name))
 
         rec_t = h.Vector()
         rec_t.record(h._ref_t)
