@@ -1,4 +1,6 @@
-scidash
-=======
+Hippounit Test Suites
+=====================
 
-A collection of candidates, tests, and records for use with SciDash.  
+__init__.py 
+-----------
+Collection of tests 

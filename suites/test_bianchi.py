@@ -1,4 +1,4 @@
-from hippounit_setup import *
+from configure import *
 
 import unittest
 import numpy as np

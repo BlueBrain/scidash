@@ -1,4 +1,4 @@
-from hippounit_setup import *
+from configure import *
 
 import unittest
 import math
@@ -21,7 +21,9 @@ class TestModels(unittest.TestCase):
           self.assertTrue(math.isnan(score.getScore("Ith").score))
           self.assertTrue(math.isnan(score.getScore("Veq").score))
           if show_summary:
-               score.summarize()
+            score.summarize()
+
+
 
 
      def test_oblique_integration(self):
@@ -40,8 +42,7 @@ class TestModels(unittest.TestCase):
           np.testing.assert_almost_equal(score.score_l[7], 3.4710455815903194e-11) 
           np.testing.assert_almost_equal(score.score_l[8], 0.30011440172735004)
           if show_summary:
-               score.summarize()
-
+            score.summarize()
 
      def test_somatic_features(self):
           observations, stimuli = somatic_features()

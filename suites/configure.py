@@ -1,24 +1,96 @@
 import os
 import sys
+import math
+import json
+import collections
+from quantities import mV, nA, ms, V, s
 
-# Use *'s in path names to prepend instead of append them to the Python path.  
+# Home directory of hippounit suite
+HIPPOUNIT_HOME = os.path.join(os.path.dirname(__file__), os.pardir)
+sys.path.insert(0, HIPPOUNIT_HOME)
 
-paths = {}
-# Path to this repository's top directory (containing models, tests, etc.)
-paths['SUITE_REPO'] = os.path.abspath('../..')
-# Path to NEURON python libraries.  
-paths['NEURON_PYTHON_PATH'] = '/Applications/NEURON/nrn/lib/python'
+# Home directory where the NEURON library and script files are saved
+HOC_HOME = os.path.join(HIPPOUNIT_HOME, 'models/hoc_models')
 
-# Path to development version of NeuronUnit.
-paths['SCIUNIT_DEV_PATH*'] = '/Users/rgerkin/Dropbox/dev/scidash/sciunit'
 
-# Path to development version of NeuronUnit.
-paths['NEURONUNIT_DEV_PATH*'] = '/Users/rgerkin/Dropbox/dev/scidash/neuronunit'
+# Home directory the the NEURON run data are saved/loaded
+DATA_DIR = os.path.join(HIPPOUNIT_HOME, 'records/saved')
 
-for path_name,path in paths.items():
-    if path not in sys.path:
-        if '*' in path_name:
-            sys.path.insert(1,path)
-        else:
-            sys.path.append(path)
 
+# Directory to save figues
+FIGS_DIR = os.path.join(HIPPOUNIT_HOME, 'records/figures')
+
+
+# Location of json file  
+STIMFEAT_JSON = os.path.join(HIPPOUNIT_HOME, 'observations/stimfeat/PC_newfeat_No14112401_15012303-m990803_stimfeat.json')
+
+
+# Observation data for depolarization_block_test
+def depolarization_block():
+    target_Ith = 0.6*nA
+    Ith_SD = 0.3*nA
+    target_Veq = -40.1*mV
+    Veq_SD = 3.4*mV
+    return {'mean_Ith':target_Ith, 'Ith_std':Ith_SD, 'mean_Veq':target_Veq, 'Veq_std':Veq_SD}
+
+
+# Observation data for oblique_integration_test
+def oblique_integration():
+	experimental_mean_threshold = 3.4*mV
+	threshold_SEM = 0.2*mV
+	exp_n = 92
+	threshold_SD = float(threshold_SEM*math.sqrt(exp_n))*mV
+
+	threshold_prox = 4.5*mV
+	threshold_prox_SEM = 0.5*mV
+	n_prox = 33
+	threshold_prox_SD = float(threshold_prox_SEM*math.sqrt(n_prox))*mV
+
+	threshold_dist = 2.6*mV
+	threshold_dist_SEM = 0.2*mV
+	n_dist = 44
+	threshold_dist_SD = float(threshold_dist_SEM*math.sqrt(n_dist))*mV
+
+	exp_mean_nonlin = 142 
+	nonlin_SEM = 9
+	nonlin_SD = nonlin_SEM*math.sqrt(exp_n)
+
+	suprath_exp_mean_nonlin = 129.0 
+	suprath_nonlin_SEM = 6.0
+	suprath_nonlin_SD = suprath_nonlin_SEM*math.sqrt(exp_n)
+
+	exp_mean_peak_deriv = 2.6*V/s     #V/s
+	deriv_SEM = 0.4*V/s
+	deriv_SD = float(deriv_SEM*math.sqrt(exp_n))*V/s
+
+	exp_mean_amp = 4.828*mV  # calculated from threshold (expected value for linearity) and from degree of nonlin 4.45 using digitizeIt on fig 1 M
+	amp_SEM = 0.28*mV  #using digitizeIt on fig 1 M
+	amp_SD = float(amp_SEM*math.sqrt(exp_n))*mV
+
+	exp_mean_time_to_peak = 13.5*ms
+	exp_mean_time_to_peak_SEM = 0.2*ms
+	exp_mean_time_to_peak_SD = float(exp_mean_time_to_peak_SEM*math.sqrt(exp_n))*ms
+
+	async_nonlin = 104.0
+	async_nonlin_SEM = 8.0
+	async_n = 23
+	async_nonlin_SD=async_nonlin_SEM*math.sqrt(async_n)
+
+	return {'mean_threshold':experimental_mean_threshold,'threshold_sem':threshold_SEM, 'threshold_std': threshold_SD,
+	        'mean_prox_threshold':threshold_prox,'prox_threshold_sem':threshold_prox_SEM, 'prox_threshold_std': threshold_prox_SD,
+	        'mean_dist_threshold':threshold_dist,'dist_threshold_sem':threshold_dist_SEM, 'dist_threshold_std': threshold_dist_SD,
+	        'mean_nonlin_at_th':exp_mean_nonlin,'nonlin_at_th_sem':nonlin_SEM, 'nonlin_at_th_std': nonlin_SD,
+	        'mean_nonlin_suprath':suprath_exp_mean_nonlin,'nonlin_suprath_sem':suprath_nonlin_SEM, 'nonlin_suprath_std': suprath_nonlin_SD,
+	        'mean_peak_deriv':exp_mean_peak_deriv,'peak_deriv_sem':deriv_SEM, 'peak_deriv_std': deriv_SD,
+	        'mean_amp_at_th':exp_mean_amp,'amp_at_th_sem':amp_SEM, 'amp_at_th_std': amp_SD,
+	        'mean_time_to_peak':exp_mean_time_to_peak,'time_to_peak_sem':exp_mean_time_to_peak_SEM, 'time_to_peak_std': exp_mean_time_to_peak_SD,
+	        'mean_async_nonlin':async_nonlin,'async_nonlin_sem':async_nonlin_SEM, 'async_nonlin_std': async_nonlin_SD,
+	        'exp_n':exp_n, 'prox_n':n_prox, 'dist_n':n_dist, 'async_n': async_n}
+
+
+# Observation data for somatic_features_test
+def somatic_features():
+	#with open('../observations/stimfeat/PC_newfeat_No14112401_15012303-m990803_stimfeat.json') as f:
+	with open(STIMFEAT_JSON) as f:
+		config = json.load(f, object_pairs_hook=collections.OrderedDict)
+	return config['features'], config['stimuli']

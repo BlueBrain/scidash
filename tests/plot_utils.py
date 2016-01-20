@@ -5,7 +5,9 @@ import math
 from neuronunit import plottools
 
 
-######## find_Ith_Veq ###########
+
+
+######## DepolarizationBlockTest ###########
 
 def plot_somatic_response_depol(path_figs, results, spikecount_array, Ith_index, Veq_index):
 	
@@ -24,15 +26,16 @@ def plot_somatic_response_depol(path_figs, results, spikecount_array, Ith_index,
 	
 
 def plot_num_aps(path_figs, amps, spikecount_array):
-	
-	plt.figure()
+	plt.close()	
+	#plt.figure()
 	plt.plot(amps,spikecount_array,'.-')
 	plt.xlabel("I (nA)")
 	plt.ylabel("number of APs")
 	plt.savefig(path_figs + 'number_of_APs' + '.pdf', dpi=600)
 
 def plot_somatic_response_Ith(path_figs, results, Ith_index):
-	plt.figure()
+	plt.close()
+	#plt.figure()
 	plt.plot(results[Ith_index][0]['T'],results[Ith_index][0]['V'])
 	plt.title("somatic response at Ith")
 	plt.xlabel("time (ms)")
@@ -94,7 +97,7 @@ def plot_num_APs_at_Ith(path_figs, model, spikecount_array, Ith_index):
 	plt.savefig(path_figs + 'num_of_APs_at_Ith' + '.pdf', dpi=600)
 
 
-###### calc_plots #########
+###### ObliqueIntegrationTest #########
 def plot_somatic_traces_sync(path_figs, dend_loc000, num, sep_results):
 	plt.close()
 	#plt.figure()
@@ -611,7 +614,7 @@ def plot_mean_errors_sync(path_figs, sd_threshold_errors, sd_prox_threshold_erro
 
 
 
-###### calc_plots_async #########
+###### ObliqueIntegrationTest #########
 
 def plot_traces_async(path_figs, dend_loc000, sep_results, num):
 
@@ -805,7 +808,7 @@ def plot_p_values(path_figs, score):
 	plt.savefig(path_figs + 'p_values' + '.pdf', dpi=600,)
 
 
-######### create_figs ############
+######### SomaticFeaturesTest ############
 def plot_traces(path_figs, traces_results):
 	plt.close()
 	for i in range (0, len(traces_results)):

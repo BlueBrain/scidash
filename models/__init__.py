@@ -12,18 +12,33 @@ from capabilities import Hoc, CurrentClamp, DendriticSynapse
 # - create a single abstract method for setting up and running a dendritic pulse
 class NeuronModel(sciunit.Model, Hoc, CurrentClamp, DendriticSynapse):
 
-    def __init__(self, name, modelpath, libpath, hocfile):
+    def __init__(self, name, modelpath, libfile, hocfile, force_compile=False):
+        """        
+        Parameters
+        ==========
+        name : string
+               Name of model
+        modelpath : string
+                    Directory where to compile (i.e. nrnivmodl) the model.
+        libfile : string
+                  Location where the built model library file is located.
+        hocfile : string
+                  Location of the hoc file used to run the model.
+        force_compile : bool
+                        will force nrnivmodl to be ran even if libfile exists
+        """
         sciunit.Model.__init__(self, name=name)
 
         self.name = name
         self.modelpath = modelpath
-        self.libpath = libpath
+        self.libfile = libfile
         self.hocfile = hocfile
 
-        if os.path.isfile(self.modelpath + self.libpath) is False:
+        # TODO: Allow users to specify build command.
+        if (force_compile) or (os.path.isfile(self.libfile) is False):
             os.system("cd " + self.modelpath + "; nrnivmodl")
+        h.nrn_load_dll(self.libfile)
 
-        h.nrn_load_dll(modelpath + libpath)
 
         self.threshold = -20
         self.stim = None
@@ -58,6 +73,21 @@ class NeuronModel(sciunit.Model, Hoc, CurrentClamp, DendriticSynapse):
         h.load_file(self.hocfile)
 
     def set_cclamp(self, amp, delay=500, dur=1000, section=None, loc=None):
+        """ Set up a current clamp to be ran on the model.
+
+        Parameters
+        ==========
+        amp : float
+              Aplitude of current.
+        delay : Integer
+                Time in milliseconds before starting stimulation
+        durtion : Integer
+                  Time in milliseconds of stimulation
+        section : NEURON identifer
+                  NEURON section of model to place stimulation electrode
+        loc : Float [0, 1] 
+              location along section to place stimulation electrode.
+        """
         if section == None or loc == None:
             # No section and/or location specified to stimulate, just set current clamp on the soma
             self.stim = h.IClamp(self.get_soma())
@@ -71,6 +101,15 @@ class NeuronModel(sciunit.Model, Hoc, CurrentClamp, DendriticSynapse):
         self.stim.dur = dur
 
     def run_cclamp(self, section=None, loc=None):
+        """ Run a current clamp and record the membrane potential.
+
+        Parameters
+        ==========
+        section : NEURON identifer
+                  NEURON section of model to place recording electrode
+        loc : Float [0, 1] 
+              location along section to place recording electrode.
+        """
         printd(("- running model", self.name))
 
         rec_t = h.Vector()
@@ -204,13 +243,15 @@ class NeuronModel(sciunit.Model, Hoc, CurrentClamp, DendriticSynapse):
 
 class KaliFreund(NeuronModel):
 
-    def __init__(self, name="Kali"):
-        cdir = os.path.dirname(os.path.realpath(__file__))
-        modelpath = os.path.join(cdir, "hoc_models/Kali_Freund_modell/scppinput/")
-        libpath = "x86_64/.libs/libnrnmech.so.0"
-        hocfile = os.path.join(cdir, "hoc_models/Kali_Freund_modell/scppinput/ca1_syn.hoc")
+    def __init__(self, name="Kali", modelpath=None, libfile=None, hocfile=None, force_compile=False):
+        if modelpath == None:
+            modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "hoc_models/Kali_Freund_modell/scppinput/")
+        if libfile == None:
+            libfile = os.path.join(modelpath, "x86_64/.libs/libnrnmech.so.0")
+        if hocfile == None:
+            hocfile = os.path.join(modelpath, "ca1_syn.hoc")
 
-        super(KaliFreund, self).__init__(name, modelpath, libpath, hocfile)
+        super(KaliFreund, self).__init__(name, modelpath, libfile, hocfile, force_compile)
 
         self.soma = "soma"
         self.dend_loc = [[80,0.27],[80,0.83],[54,0.16],[54,0.95],[52,0.38],[52,0.83],[53,0.17],[53,0.7],[28,0.35],[28,0.78]]
@@ -229,13 +270,15 @@ class KaliFreund(NeuronModel):
 
 class Migliore(NeuronModel):
 
-    def __init__(self, name="Migliore"):
-        cdir = os.path.dirname(os.path.realpath(__file__))
-        modelpath = os.path.join(cdir, "hoc_models/Migliore_Schizophr/")        
-        libpath = "x86_64/.libs/libnrnmech.so.0"
-        hocfile = os.path.join(cdir, "hoc_models/Migliore_Schizophr/basic_sim_9068802-test.hoc")
+    def __init__(self, name="Migliore", modelpath=None, libfile=None, hocfile=None, force_compile=False):
+        if modelpath == None:
+            modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "hoc_models/Migliore_Schizophr/")
+        if libfile == None:
+            libfile = os.path.join(modelpath, "x86_64/.libs/libnrnmech.so.0")
+        if hocfile == None:
+            hocfile = os.path.join(modelpath, "basic_sim_9068802-test.hoc")
 
-        super(Migliore, self).__init__(name, modelpath, libpath, hocfile)
+        super(Migliore, self).__init__(name, modelpath, libfile, hocfile, force_compile)
 
         self.soma = "soma[0]"
         self.dend_loc = [[17,0.3],[17,0.9],[24,0.3],[24,0.7],[22,0.3],[22,0.7],[25,0.2],[25,0.5],[30,0.1],[30,0.5]]
@@ -256,16 +299,18 @@ class Migliore(NeuronModel):
 
 class Bianchi(NeuronModel):
 
-    def __init__(self, name="Bianchi"):
-        cdir = os.path.dirname(os.path.realpath(__file__))
-        modelpath = os.path.join(cdir, "hoc_models/Ca1_Bianchi/experiment/")
-        libpath = "x86_64/.libs/libnrnmech.so.0"
-        hocfile = os.path.join(cdir, "hoc_models/Ca1_Bianchi/experiment/basic.hoc")
+    def __init__(self, name="Bianchi", modelpath=None, libfile=None, hocfile=None, force_compile=False):
+        if modelpath == None:
+            modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "hoc_models/Ca1_Bianchi/experiment/")
+        if libfile == None:
+            libfile = os.path.join(modelpath, "x86_64/.libs/libnrnmech.so.0")
+        if hocfile == None:
+            hocfile = os.path.join(modelpath, "basic.hoc")
 
-        super(Bianchi, self).__init__(name, modelpath, libpath, hocfile)
+        super(Bianchi, self).__init__(name, modelpath, libfile, hocfile, force_compile)
 
         self.soma = "soma[0]"
-        self.dend_loc = [[112,0.375],[112,0.875],[118,0.167],[118,0.99],[30,0.167],[30,0.83],[107,0.25],[107,0.75],[114,0.01],[114,0.75]]
+        self.dend_loc = [[112,0.375], [112,0.875], [118,0.167], [118,0.99], [30,0.167], [30,0.83], [107,0.25],[107,0.75],[114,0.01],[114,0.75]]
         self.trunk_dend_loc_distr = [[65,0.5], [69,0.5], [71,0.5], [64,0.5], [62,0.5], [60,0.5], [81,0.5]]
         self.trunk_dend_loc_clust = [65,0.5]
 
@@ -284,13 +329,15 @@ class Bianchi(NeuronModel):
 
 class Golding(NeuronModel):
 
-    def __init__(self, name="Golding"):
-        cdir = os.path.dirname(os.path.realpath(__file__))
-        modelpath = os.path.join(cdir, "hoc_models/Golding_dichotomy/fig08/")
-        libpath = "x86_64/.libs/libnrnmech.so.0"
-        hocfile = os.path.join(cdir, "hoc_models/Golding_dichotomy/fig08/run_basic.hoc")
+    def __init__(self, name="Golding", modelpath=None, libfile=None, hocfile=None, force_compile=False):
+        if modelpath == None:
+            modelpath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "hoc_models/Golding_dichotomy/fig08/")
+        if libfile == None:
+            libfile = os.path.join(modelpath, "x86_64/.libs/libnrnmech.so.0")
+        if hocfile == None:
+            hocfile = os.path.join(modelpath, "run_basic.hoc")
 
-        super(Golding, self).__init__(name, modelpath, libpath, hocfile)
+        super(Golding, self).__init__(name, modelpath, libfile, hocfile, force_compile)
 
         self.soma = "somaA"
         self.dend_loc = [["dendA5_00",0.275],["dendA5_00",0.925],["dendA5_01100",0.15],["dendA5_01100",0.76],["dendA5_0111100",0.115],["dendA5_0111100",0.96],["dendA5_01111100",0.38],["dendA5_01111100",0.98],["dendA5_0111101",0.06],["dendA5_0111101",0.937]]
